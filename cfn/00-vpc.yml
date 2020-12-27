@@ -1,0 +1,218 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description:
+  Create VPC and Subnets
+
+Parameters:
+
+  Systemname: 
+    Description: "Please input Systemname."
+    Type: String
+    Default: "system"
+    
+  Environment: 
+    Description: "Please input Environment."
+    Type: String
+    Default: "dev"
+    ConstraintDescription: ""
+    
+  VpcCidr: 
+    Description: "Please input VPC CIDR (ex.10.0.0.0/16)"
+    Type: String
+    Default: "10.0.0.0/16"
+    ConstraintDescription: ""
+
+Metadata:
+  "AWS::CloudFormation::Interface": 
+    ParameterGroups: 
+      - Label: 
+          default: "Common"
+        Parameters: 
+          - Systemname
+          - Environment
+      - Label: 
+          default: "VPC"
+        Parameters: 
+          - VpcCidr
+
+Resources: 
+
+## VPC
+  Vpc: 
+    Type: "AWS::EC2::VPC"
+    Properties: 
+      CidrBlock: !Ref VpcCidr
+      InstanceTenancy: default
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: 
+        - Key: Name
+          Value: !Sub "${Environment}-${Systemname}-vpc"
+
+## Internet Gateway
+  Igw: 
+    Type: "AWS::EC2::InternetGateway"
+    Properties: 
+      Tags: 
+        - Key: Name
+          Value: !Sub "${Environment}-${Systemname}-igw"
+  Gw1: 
+    Type: "AWS::EC2::VPCGatewayAttachment"
+    Properties: 
+      VpcId: 
+        Ref: Vpc
+      InternetGatewayId: 
+        Ref: Igw
+
+## DHCP Option
+  DhcpOption: 
+    Type: "AWS::EC2::DHCPOptions"
+    Properties: 
+      DomainName: !Sub "${AWS::Region}.compute.internal"
+      DomainNameServers: 
+        - AmazonProvidedDNS
+        
+  DchpAssoc1: 
+    Type: "AWS::EC2::VPCDHCPOptionsAssociation"
+    Properties: 
+      VpcId: 
+        Ref: Vpc
+      DhcpOptionsId: 
+        Ref: DhcpOption
+
+## Route Table (Public and Private)
+  RouteTablePublic: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: 
+        Ref: Vpc
+        
+  RouteTablePrivate: 
+    Type: "AWS::EC2::RouteTable"
+    Properties: 
+      VpcId: 
+        Ref: Vpc
+
+  RouteForIgw: 
+    Type: "AWS::EC2::Route"
+    Properties: 
+      DestinationCidrBlock: "0.0.0.0/0"
+      RouteTableId: !Ref RouteTablePublic
+      GatewayId: !Ref Igw
+    DependsOn: Gw1
+
+## Public Subnets    
+  SubnetPublic01: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      ### /24(8) * 4Subnets
+      CidrBlock: !Select [ 0, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### AZ-A
+      AvailabilityZone:  !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: 
+        Ref: Vpc
+      Tags: 
+        - Key: Name
+          Value: !Sub "${Environment}-${Systemname}-public-01"
+          
+  SubnetRoutePublic01: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId:
+        Ref: RouteTablePublic
+      SubnetId: 
+        Ref: SubnetPublic01
+
+  SubnetPublic02: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      ### /24(8) * 4Subnets
+      CidrBlock: !Select [ 1, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### AZ-C
+      AvailabilityZone:  !Select
+        - 2
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: !Ref Vpc
+      Tags: 
+        - Key: Name
+          Value: !Sub "${Environment}-${Systemname}-public-02"
+          
+  SubnetRoutePublic02: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId: !Ref RouteTablePublic
+      SubnetId: !Ref SubnetPublic02
+
+## Private Subnets        
+  SubnetPrivate01: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      ### /24(8) * 4Subnets
+      CidrBlock: !Select [ 2, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### AZ-A
+      AvailabilityZone:  !Select
+        - 0
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: 
+        Ref: Vpc
+      Tags: 
+        - Key: Name
+          Value: !Sub "${Environment}-${Systemname}-private-01"
+          
+  SubnetRoutePrivate01: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId:
+        Ref: RouteTablePrivate
+      SubnetId: 
+        Ref: SubnetPrivate01
+
+  SubnetPrivate02: 
+    Type: "AWS::EC2::Subnet"
+    Properties: 
+      ### /24(8) * 4Subnets
+      CidrBlock: !Select [ 3, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### AZ-C
+      AvailabilityZone:  !Select
+        - 2
+        - Fn::GetAZs: !Ref "AWS::Region"
+      VpcId: 
+        Ref: Vpc
+      Tags: 
+        - Key: Name
+          Value: !Sub "${Environment}-${Systemname}-private-02"
+          
+  SubnetRoutePrivate02: 
+    Type: "AWS::EC2::SubnetRouteTableAssociation"
+    Properties: 
+      RouteTableId:
+        Ref: RouteTablePrivate
+      SubnetId: 
+        Ref: SubnetPrivate02
+
+Outputs:
+  Vpc:
+    Value: !Ref Vpc
+    Export: 
+      Name: !Sub "${Environment}-Vpc"
+  VpcCidr:
+    Value: !Ref VpcCidr
+    Export: 
+      Name: !Sub "${Environment}-VpcCidr"
+  SubnetPublic01:
+    Value: !Ref SubnetPublic01
+    Export:
+      Name: !Sub "${Environment}-SubnetPublic01"
+  SubnetPublic02:
+    Value: !Ref SubnetPublic02
+    Export:
+      Name: !Sub "${Environment}-SubnetPublic02"
+  SubnetPrivate01:
+    Value: !Ref SubnetPrivate01
+    Export:
+      Name: !Sub "${Environment}-SubnetPrivate01"
+  SubnetPrivate02:
+    Value: !Ref SubnetPrivate02
+    Export:
+      Name: !Sub "${Environment}-SubnetPrivate02"
