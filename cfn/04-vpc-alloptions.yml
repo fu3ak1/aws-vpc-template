@@ -129,8 +129,8 @@ Resources:
   SubnetPublic01: 
     Type: "AWS::EC2::Subnet"
     Properties: 
-      ### /24(8) * 4Subnets
-      CidrBlock: !Select [ 0, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### 1st of /24(8bit) * 2Subnets
+      CidrBlock: !Select [ 0, !Cidr [ !GetAtt Vpc.CidrBlock, 2, 8 ]]
       ### AZ-A
       AvailabilityZone:  !Select
         - 0
@@ -152,8 +152,8 @@ Resources:
   SubnetPublic02: 
     Type: "AWS::EC2::Subnet"
     Properties: 
-      ### /24(8) * 4Subnets
-      CidrBlock: !Select [ 1, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### 2nd of /24(8bit) * 2Subnets
+      CidrBlock: !Select [ 1, !Cidr [ !GetAtt Vpc.CidrBlock, 2, 8 ]]
       ### AZ-C
       AvailabilityZone:  !Select
         - 2
@@ -173,8 +173,8 @@ Resources:
   SubnetPrivate01: 
     Type: "AWS::EC2::Subnet"
     Properties: 
-      ### /24(8) * 4Subnets
-      CidrBlock: !Select [ 2, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### 11th of /24(8bit) * 12Subnets
+      CidrBlock: !Select [ 10, !Cidr [ !GetAtt Vpc.CidrBlock, 12, 8 ]]
       ### AZ-A
       AvailabilityZone:  !Select
         - 0
@@ -196,8 +196,8 @@ Resources:
   SubnetPrivate02: 
     Type: "AWS::EC2::Subnet"
     Properties: 
-      ### /24(8) * 4Subnets
-      CidrBlock: !Select [ 3, !Cidr [ !GetAtt Vpc.CidrBlock, 4, 8 ]]
+      ### 12th of /24(8bit) * 12Subnets
+      CidrBlock: !Select [ 11, !Cidr [ !GetAtt Vpc.CidrBlock, 12, 8 ]]
       ### AZ-C
       AvailabilityZone:  !Select
         - 2
@@ -207,7 +207,7 @@ Resources:
       Tags: 
         - Key: Name
           Value: !Sub "${Environment}-${Systemname}-private-02"
-          
+
   SubnetRoutePrivate02: 
     Type: "AWS::EC2::SubnetRouteTableAssociation"
     Properties: 
