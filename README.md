@@ -8,7 +8,7 @@ Some common vpc templates (IaC)
 * 2 Public Subnets and 2 Private Subets
 * Intenet Gateway
 
-[](./images/00-vpc.dio.svg)
+![](./images/00-vpc.dio.svg)
 
 ## VPC with NAT Gateway
 
@@ -18,7 +18,7 @@ Some common vpc templates (IaC)
 * Intenet Gateway
 * Nat Gateway
 
-[](./images/01-vpc-natgw.dio.svg)
+![](./images/01-vpc-natgw.dio.svg)
 
 ## VPC with FLow Logs (S3)
 
@@ -28,7 +28,7 @@ Some common vpc templates (IaC)
 * Intenet Gateway
 * VPC Flow Logs with S3 Bucket
 
-[](./images/02-vpc-s3flowlogs.dio.svg)
+![](./images/02-vpc-s3flowlogs.dio.svg)
 
 ## VPC with Endpoint for S3
 
@@ -38,7 +38,7 @@ Some common vpc templates (IaC)
 * Intenet Gateway
 * VPC Endpoint for S3
 
-[](./images/03-vpc-s3endpoint.dio.svg)
+![](./images/03-vpc-s3endpoint.dio.svg)
 
 ## VPC with all options so far
 
@@ -50,7 +50,7 @@ Some common vpc templates (IaC)
 * VPC Flow Logs with S3 Bucket
 * VPC Endpoint for S3
 
-[](./images/04-vpc-alloptions.dio.svg)
+![](./images/04-vpc-alloptions.dio.svg)
 
 ## VPC with 6 subnets
 
@@ -59,4 +59,4 @@ Some common vpc templates (IaC)
 * 2 Public Subnets and 4 Private Subets
 * Intenet Gateway
 
-[](./images/05-vpc-6subnets.dio.svg)
+![](./images/05-vpc-6subnets.dio.svg)
