@@ -212,24 +212,24 @@ Outputs:
   Vpc:
     Value: !Ref Vpc
     Export: 
-      Name: !Sub "${Environment}-Vpc"
+      Name: !Sub "${Environment}-${Systemname}-Vpc"
   VpcCidr:
     Value: !Ref VpcCidr
     Export: 
-      Name: !Sub "${Environment}-VpcCidr"
+      Name: !Sub "${Environment}-${Systemname}-VpcCidr"
   SubnetPublic01:
     Value: !Ref SubnetPublic01
     Export:
-      Name: !Sub "${Environment}-SubnetPublic01"
+      Name: !Sub "${Environment}-${Systemname}-SubnetPublic01"
   SubnetPublic02:
     Value: !Ref SubnetPublic02
     Export:
-      Name: !Sub "${Environment}-SubnetPublic02"
+      Name: !Sub "${Environment}-${Systemname}-SubnetPublic02"
   SubnetPrivate01:
     Value: !Ref SubnetPrivate01
     Export:
-      Name: !Sub "${Environment}-SubnetPrivate01"
+      Name: !Sub "${Environment}-${Systemname}-SubnetPrivate01"
   SubnetPrivate02:
     Value: !Ref SubnetPrivate02
     Export:
-      Name: !Sub "${Environment}-SubnetPrivate02"
+      Name: !Sub "${Environment}-${Systemname}-SubnetPrivate02"
